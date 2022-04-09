@@ -19,6 +19,8 @@ func SPAServer(index string, fs http.FileSystem) http.Handler {
 	}
 }
 
+const indexPage = "/index.html"
+
 func (s *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get the absolute path to prevent directory traversal
 	path, err := filepath.Abs(r.URL.Path)
@@ -35,7 +37,12 @@ func (s *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(s.index, "/") {
 			s.index = "/" + s.index
 		}
+
 		r.URL.Path = s.index
+		if indexPage == s.index {
+			r.URL.Path = "/"
+		}
+
 		http.FileServer(s.fs).ServeHTTP(w, r)
 		return
 	} else if err != nil {
